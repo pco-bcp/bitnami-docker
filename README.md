@@ -26,7 +26,7 @@ git init
 
 ```
 cd mysite
-git clone https://github.com/djsutter/bitnami-docker.git docker
+git clone https://github.com/pco-bcp/bitnami-docker.git docker
 ```
 
 ## Set your environment variables
@@ -34,7 +34,7 @@ git clone https://github.com/djsutter/bitnami-docker.git docker
 Edit `.env` and modify as per this example:
 
 ```sh
-BASE_IMAGE=dsutter/mysite
+BASE_IMAGE=pco-bcp/mysite
 DOCKER_NAME=mysite
 DB_NAME=drproj
 PROFILE_NAME=wxt
