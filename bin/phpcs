@@ -1,0 +1,11 @@
+#!/bin/bash
+
+phpcs --standard=Drupal \
+    --extensions=php,module,inc,install,test,profile,theme \
+    --report=full \
+    --colors \
+    --ignore=*.css \
+    --ignore=*.txt \
+    --ignore=*.md \
+    --ignore=html/*/custom/*/*.info.yml \
+    html/modules/contrib/entity

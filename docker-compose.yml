@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  web:
+    build:
+      context: docker/images/dev
+      args:
+        - BASE_IMAGE=${BASE_IMAGE}
+    container_name: ${DOCKER_NAME}_web
+    environment:
+      DB_NAME: $DB_NAME
+    volumes:
+      - ./docker/conf/drupal/settings.php:/app/html/sites/default/settings.php:ro
+      - files:/app/html/sites/default/files:rw
+      - ./docker:/app/docker
+
+  nginx:
+    build:
+      context: docker/images/nginx
+      args:
+        - BASE_IMAGE=${BASE_IMAGE}
+    container_name: ${DOCKER_NAME}_nginx
+    depends_on:
+      - web
+    ports:
+      - '8080:80'
+    volumes:
+      - files:/app/html/sites/default/files
+      - ./docker/conf/nginx.conf:/opt/bitnami/nginx/conf/server_blocks/drupal.conf
+
+  mariadb:
+    image: docker.io/bitnami/mariadb:10.6
+    container_name: ${DOCKER_NAME}_db
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=drupal
+      - MARIADB_PASSWORD=drupal
+      - MARIADB_DATABASE=${DB_NAME}
+    volumes:
+      - db:/bitnami/mariadb
+
+volumes:
+  db:
+    driver: local
+  files:
+    driver: local

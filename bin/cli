@@ -1,0 +1,160 @@
+#!/bin/bash
+
+# Docroot.
+cd /app/html/;
+
+# Trap.
+if [[ $# -eq 0 ]]; then
+  exit 1
+fi
+
+COMMAND=$1
+OPTION=$2
+NFS=$3
+EXIT_VALUE=0
+
+if [ -z "${OPTION-}" ]; then
+  OPTION='standard'
+fi
+
+##
+# SCRIPT COMMANDS
+##
+
+# drupal_init
+#
+# Configure the initial Drupal f.s.
+#
+drupal_init() {
+  # header Configure the initial Drupal f.s.
+
+  # Set the default settings.php
+  chmod 777 /app/html/sites/default
+  chmod 777 /app/html/sites/default/files
+
+  if [ -f /app/html/sites/default/settings.php ]; then
+    chmod 777 /app/html/sites/default/settings.php
+    rm /app/html/sites/default/settings.php
+  fi
+
+  if [ -f /app/html/sites/default/default.settings.php ]; then
+    chmod 777 /app/html/sites/default/default.settings.php
+    rm /app/html/sites/default/default.settings.php
+  fi
+
+  cp /app/docker/conf/drupal/default.settings.php /app/html/sites/default/default.settings.php
+}
+
+# drupal_install
+#
+# Installs Drupal distribution.
+#
+drupal_install() {
+  header Install Drupal distribution
+  # We will let bash manage errors with set -e (errexit)
+  set -e
+  time drush si "${OPTION}" \
+    --sites-subdir=default \
+    --site-name="Drupal Install Profile (${OPTION})" \
+    wxt_extension_configure_form.select_all='TRUE' \
+    install_configure_form.update_status_module='array(FALSE,FALSE)' \
+    --yes
+  set +e
+}
+
+# drupal_migrate
+#
+# Initialize migrate + default content.
+#
+drupal_migrate() {
+  header Initialize migrate and default content
+  cd /app/html/sites/default
+  drush config-set wxt_library.settings wxt.theme theme-gcweb -y
+  drush migrate:import --group wxt --tag 'Core'
+  drush migrate:import --group gcweb --tag 'Core'
+  drush migrate:import --group gcweb --tag 'Menu'
+}
+
+# drupal_perm
+#
+# Configure the settings.php and files directory permissions.
+#
+drupal_perm() {
+  header Configure the settings.php and files directory permissions
+
+  if [[ $NFS != "nfs" ]]; then
+    chown -R -f :www-data /app/html/
+    sleep 5
+  fi
+
+  php -r 'opcache_reset();';
+  sleep 5
+
+  chmod 444 sites/default/settings.php
+
+  # Create private files directory.
+  if [ ! -d /app/files_private ]; then
+    mkdir /app/files_private;
+  fi
+
+  chmod 777 -R /app/files_private;
+  chmod 777 -R sites/default/files
+}
+
+##
+# UTILITY FUNCTIONS:
+##
+
+# Prints a message about the section of the script.
+header() {
+  set +xv
+  echo
+  echo "** $@"
+  echo
+  set -xv
+}
+
+# Sets the exit level to error.
+set_error() {
+  EXIT_VALUE=1
+}
+
+# Runs a command showing all the lines executed
+run_command() {
+  set -xv
+  $@
+  set +xv
+}
+
+##
+# SCRIPT MAIN:
+##
+
+# Capture all errors and set our overall exit value.
+trap 'set_error' ERR
+
+case $COMMAND in
+  drupal-first-run)
+    run_command drupal_init
+    run_command drupal_install
+    run_command drupal_perm
+    ;;
+
+  drupal-init)
+    run_command drupal_init
+    ;;
+
+  drupal-install)
+    run_command drupal_install
+    ;;
+
+  drupal-migrate)
+    run_command drupal_migrate
+    ;;
+
+  drupal-perm)
+    run_command drupal_perm
+    ;;
+esac
+
+exit $EXIT_VALUE
