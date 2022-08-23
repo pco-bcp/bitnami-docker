@@ -28,7 +28,7 @@ phpcs:
 	docker run -i --entrypoint=/app/docker/bin/phpcs \
     --volumes-from $(DOCKER_NAME)_web \
     --rm \
-	drproject_web
+	$(DOCKER_NAME)_web
 
 sh:
 	docker-compose exec web bash

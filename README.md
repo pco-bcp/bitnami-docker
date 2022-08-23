@@ -18,14 +18,14 @@ Since you cloned the site-wxt repo, make it your own by removing the
 git folder and initialze a new one.
 
 ```
-rm -r .git
+cd mysite
+rm -rf .git
 git init
 ```
 
 ## Bring in the docker scaffold
 
 ```
-cd mysite
 git clone https://github.com/pco-bcp/bitnami-docker.git docker
 ```
 
@@ -36,7 +36,7 @@ Edit `.env` and modify as per this example:
 ```sh
 BASE_IMAGE=pco-bcp/mysite
 DOCKER_NAME=mysite
-DB_NAME=drproj
+DB_NAME=mysite
 PROFILE_NAME=wxt
 # This must match the name of your folder
 DOCKER_IMAGE=mysite

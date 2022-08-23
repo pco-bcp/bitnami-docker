@@ -798,7 +798,7 @@ $databases['default']['default'] = array (
   'username' => 'drupal',
   'password' => 'drupal',
   'prefix' => '',
-  'host' => 'drproject_db',
+  'host' => getenv('DB_HOST'),
   'port' => '3306',
   'driver' => 'mysql',
 );

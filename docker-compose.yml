@@ -9,6 +9,7 @@ services:
     container_name: ${DOCKER_NAME}_web
     environment:
       DB_NAME: $DB_NAME
+      DB_HOST: ${DOCKER_NAME}_db
     volumes:
       - ./docker/conf/drupal/settings.php:/app/html/sites/default/settings.php:ro
       - files:/app/html/sites/default/files:rw
