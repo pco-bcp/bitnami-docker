@@ -11,6 +11,9 @@ base:
 	    --no-cache \
 		.
 
+behat:
+	./docker/bin/behat -c behat.yml
+
 build: all
 
 docker_build:

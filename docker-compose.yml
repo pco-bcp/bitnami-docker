@@ -12,7 +12,7 @@ services:
       DB_HOST: ${DOCKER_NAME}_db
     volumes:
       - ./docker/conf/drupal/settings.php:/app/html/sites/default/settings.php:ro
-      - files:/app/html/sites/default/files:rw
+      - files_data:/app/html/sites/default/files:rw
       - ./docker:/app/docker
 
   nginx:
@@ -26,10 +26,10 @@ services:
     ports:
       - '8080:80'
     volumes:
-      - files:/app/html/sites/default/files
+      - files_data:/app/html/sites/default/files
       - ./docker/conf/nginx.conf:/opt/bitnami/nginx/conf/server_blocks/drupal.conf
 
-  mariadb:
+  db:
     image: docker.io/bitnami/mariadb:10.6
     container_name: ${DOCKER_NAME}_db
     environment:
@@ -38,10 +38,32 @@ services:
       - MARIADB_PASSWORD=drupal
       - MARIADB_DATABASE=${DB_NAME}
     volumes:
-      - db:/bitnami/mariadb
+      - db_data:/bitnami/mariadb
+
+  hub:
+    image: selenium/hub:3.141.59
+    ports:
+      - "4444:4444"
+    depends_on:
+      - db
+      - web
+    container_name: ${DOCKER_NAME}_hub
+
+  firefox:
+    #image: selenium/node-firefox:2.53.1
+    image: selenium/node-firefox-debug:2.53.1
+    ports:
+      - "5900:5900"
+    depends_on:
+      - db
+      - web
+      - hub
+    container_name: ${DOCKER_NAME}_firefox
+    environment:
+      HUB_PORT_4444_TCP_ADDR: hub
 
 volumes:
-  db:
+  db_data:
     driver: local
-  files:
+  files_data:
     driver: local

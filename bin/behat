@@ -1,0 +1,25 @@
+#!/bin/bash
+# strict mode http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+
+# Source all the configuration environment variables from the docker-compose
+# .env file.
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. ${dir}/source_config
+
+if ! type docker > /dev/null; then
+  echo "Docker is required to be present on $PATH"
+  exit 0
+fi
+
+if [ -z "${BEHAT_PATH-}" ]; then
+  echo "No behat configuration detected exiting..."
+  exit
+fi
+
+docker-compose exec \
+  -e "IDE_BEHAT_VERSION=3.2.2" \
+  -e "IDE_BEHAT_DIR=/app/vendor/behat/behat/bin/behat" \
+  -w "/app/html/${BEHAT_PATH}" \
+  -e BEHAT_PARAMS='{"extensions":{"Drupal\\DrupalExtension":{"drupal":{"drupal_root":"/app/html"}, "drush":{"root":"/app/html"}}, "Behat\\MinkExtension":{"base_url" : "http://nginx", "selenium2":{"wd_host":"http://hub:4444/wd/hub"}}}}' \
+  web /app/vendor/bin/behat

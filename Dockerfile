@@ -8,8 +8,7 @@ RUN echo -e "\\nalias ll='ls -alF'\\nalias ls='ls --color=auto'\\n" >> /root/.ba
 
 COPY docker/conf/php.ini /opt/bitnami/php/etc/conf.d/php.ini
 COPY scripts/ScriptHandler.php /app/scripts/ScriptHandler.php
-COPY composer.json /app/composer.json
-COPY composer.lock /app/composer.lock
+COPY composer.json composer.lock auth.json* /app/
 
 WORKDIR /app
 
