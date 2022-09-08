@@ -2,14 +2,14 @@
 
 Provides an barebones, fast, and lightweight local / CI docker environment to work with [Drupal WxT][wxt].
 
-Based on https://github.com/drupalwxt/docker-scaffold.git
+Based on https://github.com/drupalwxt/docker-scaffold
 
 ## Setup
 
 To setup a complete project, start with a clone of site-wxt:
 
 ```
-git clone https://github.com/drupalwxt/site-wxt.git mysite
+git clone git@github.com:drupalwxt/site-wxt.git mysite
 ```
 
 ## Make it your own
@@ -26,7 +26,7 @@ git init
 ## Bring in the docker scaffold
 
 ```
-git clone https://github.com/pco-bcp/bitnami-docker.git docker
+git clone git@github.com:pco-bcp/bitnami-docker.git docker
 ```
 
 ## Set your environment variables
